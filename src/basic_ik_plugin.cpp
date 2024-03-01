@@ -51,19 +51,21 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
 
   // Base
   double angleToGoal = atan2(py, px);
-  double distanceToGoalXY = sqrt(pow(px, 2) + pow(py, 2));
+  double distanceToGoalXY = sqrt(pow2(px) + pow2(py));
   double angleWristOffset = abs(asin(HAND_OFFSET / distanceToGoalXY));
-  double base = angleToGoal - M_PI - angleWristOffset;
+  double base = angleToGoal - angleWristOffset;
 
   // Shoulder
   double shoulderZ = BASE_LENGTH;
-  double shoulderToGoalDistanceX = sqrt(pow(distanceToGoalXY, 2) + pow(pz - shoulderZ, 2));
+  double shoulderToGoalDistanceX = sqrt(pow2(distanceToGoalXY) + pow2(pz - shoulderZ));
   double innerShoulderAngle = acos(
     (
-      pow(shoulderToGoalDistanceX, 2) + pow(UPPERARM_LENGTH, 2) - pow(FOREARM_LENGTH, 2)
+      pow2(shoulderToGoalDistanceX) +
+      pow2(UPPERARM_LENGTH) -
+      pow2(FOREARM_LENGTH)
     )
     /
-    (-2 * shoulderToGoalDistanceX * UPPERARM_LENGTH)
+    (-2.0 * shoulderToGoalDistanceX * UPPERARM_LENGTH)
   );
   double shoulderToGoalZ = pz - shoulderZ;
   double shoulderToGoalX = distanceToGoalXY;
@@ -73,9 +75,9 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   // Elbow
   double innerElbowAngle = acos(
     (
-      pow(shoulderToGoalDistanceX, 2) -
-      pow(FOREARM_LENGTH, 2) -
-      pow(UPPERARM_LENGTH, 2)
+      pow2(shoulderToGoalDistanceX) -
+      pow2(FOREARM_LENGTH) -
+      pow2(UPPERARM_LENGTH)
     )
     /
     (-2.0 * FOREARM_LENGTH * UPPERARM_LENGTH)
@@ -84,9 +86,9 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   double elbow = -(M_PI - innerElbowAngle);
 
   // Wrist
-  double wrist = atan2(
-    (az - sqrt(pow(az, 2) + pow(oz, 2))), oz
-  ) * -2.0;
+  double wrist = -2.0 * atan2(
+    (az - sqrt(pow2(az) + pow2(oz))), oz
+  );
 
   MatrixXd angles(4, 1);
   angles << base, shoulder, elbow, wrist;

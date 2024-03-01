@@ -153,6 +153,11 @@ private:
       double value,
       std::vector<double>& states) const;
 
+    inline double pow2(double x)
+    {
+      return x * x;
+    }
+
     static inline double clamp(
       double value, double low, double high)
     {
