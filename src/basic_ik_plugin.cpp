@@ -23,6 +23,12 @@ IKPlugin::IKPlugin() :
 
 MatrixXd IKPlugin::solve(Matrix4d pose) const
 {
+  const double BASE_LENGTH = 0.67;
+  const double UPPERARM_LENGTH = 0.7;
+  const double FOREARM_LENGTH = 0.7;
+  const double HAND_OFFSET = 0.05;
+  const double HAND_LENGTH = 0.18;
+
   // Normal
   double nx = pose(0, 0);
   double ny = pose(1, 0);
@@ -43,8 +49,47 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   double py = pose(1, 3);
   double pz = pose(2, 3);
 
+  // Base
+  double angleToGoal = atan2(py, px);
+  double distanceToGoalXY = sqrt(pow(px, 2) + pow(py, 2));
+  double angleWristOffset = abs(asin(HAND_OFFSET / distanceToGoalXY));
+  double base = angleToGoal - M_PI - angleWristOffset;
+
+  // Shoulder
+  double shoulderZ = BASE_LENGTH;
+  double shoulderToGoalDistanceX = sqrt(pow(distanceToGoalXY, 2) + pow(pz - shoulderZ, 2));
+  double innerShoulderAngle = acos(
+    (
+      pow(shoulderToGoalDistanceX, 2) + pow(UPPERARM_LENGTH, 2) - pow(FOREARM_LENGTH, 2)
+    )
+    /
+    (-2 * shoulderToGoalDistanceX * UPPERARM_LENGTH)
+  );
+  double shoulderToGoalZ = pz - shoulderZ;
+  double shoulderToGoalX = distanceToGoalXY;
+  double shoulderToGoalAngle = atan2(shoulderToGoalZ, shoulderToGoalX);
+  double shoulder = shoulderToGoalAngle + innerShoulderAngle;
+
+  // Elbow
+  double innerElbowAngle = acos(
+    (
+      pow(shoulderToGoalDistanceX, 2) -
+      pow(FOREARM_LENGTH, 2) -
+      pow(UPPERARM_LENGTH, 2)
+    )
+    /
+    (-2.0 * FOREARM_LENGTH * UPPERARM_LENGTH)
+  );
+
+  double elbow = -(M_PI - innerElbowAngle);
+
+  // Wrist
+  double wrist = atan2(
+    (az - sqrt(pow(az, 2) + pow(oz, 2))), oz
+  ) * -2.0;
+
   MatrixXd angles(4, 1);
-  angles << 0.0, 0.0, 0.0, 0.0;
+  angles << base, shoulder, elbow, wrist;
   return angles;
 }
 
@@ -55,7 +100,7 @@ bool IKPlugin::initialize(
   const vector<string> &tip_frames,
   double search_discretization)
 {
-  ROS_INFO("Basic IK Plugin Initializing");
+  ROS_INFO("Basic IK Geometric Plugin Initializing");
 
   m_pPlanningGroup = robot_model.getJointModelGroup(group_name);
   auto joints = m_pPlanningGroup->getJointModels();
@@ -246,8 +291,7 @@ bool IKPlugin::searchPositionIK(
   solution.resize(m_joints.size());
 
   // Solve inverse kinematics
-  Vector3d origin = getOrigin();
-  Matrix4d goal = getGoal(ik_poses, origin);
+  Matrix4d goal = getGoal(ik_poses);
   MatrixXd angles = solve(goal);
 
   // Return solution
@@ -287,41 +331,14 @@ const JointModel* IKPlugin::getJoint(
 }
 
 Matrix4d IKPlugin::getGoal(
-  const std::vector<geometry_msgs::Pose>& ik_poses,
-  const Eigen::Vector3d& origin) const
+  const std::vector<geometry_msgs::Pose>& ik_poses) const
 {
   Isometry3d goal;
   auto goalPose = ik_poses.back();
   tf2::fromMsg(goalPose, goal);
 
   Matrix4d goalMatrix = goal.matrix();
-  goalMatrix(0, 3) = goalMatrix(0, 3) - origin.x();
-  goalMatrix(1, 3) = goalMatrix(1, 3) - origin.y();
-  goalMatrix(2, 3) = goalMatrix(2, 3) - origin.z();
-
   return goalMatrix;
-}
-
-Vector3d IKPlugin::getGoalPosition(
-  const vector<geometry_msgs::Pose>& ik_poses,
-  const Eigen::Vector3d& origin) const
-{
-  Isometry3d goal;
-  auto goalPose = ik_poses.back();
-  tf2::fromMsg(goalPose, goal);
-
-  Vector3d pos = goal.translation();
-  pos.x() = pos.x() - origin.x();
-  pos.y() = pos.y() - origin.y();
-  pos.z() = pos.z() - origin.z();
-
-  return pos;
-}
-
-Vector3d IKPlugin::getOrigin() const
-{
-  return m_pState->getGlobalLinkTransform(m_pBaseJoint->getChildLinkModel())
-    .translation();
 }
 
 Isometry3d IKPlugin::setJointState(

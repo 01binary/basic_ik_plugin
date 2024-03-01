@@ -139,12 +139,7 @@ private:
     MatrixXd solve(Matrix4d pose) const;
 
     Matrix4d getGoal(
-      const std::vector<geometry_msgs::Pose>& ik_poses,
-      const Vector3d& origin) const;
-    Vector3d getGoalPosition(
-      const std::vector<geometry_msgs::Pose>& ik_poses,
-      const Vector3d& origin) const;
-    Vector3d getOrigin() const;
+      const std::vector<geometry_msgs::Pose>& ik_poses) const;
 
     const robot_model::JointModel* getJoint(
       robot_model::JointModel::JointType type,
