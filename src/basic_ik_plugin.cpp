@@ -91,7 +91,7 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   );
 
   MatrixXd angles(4, 1);
-  angles << base, shoulder, elbow, wrist;
+  angles << base, 0.0, 0.0, 0.0;
   return angles;
 }
 
