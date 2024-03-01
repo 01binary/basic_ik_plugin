@@ -43,8 +43,225 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   double py = pose(1, 3);
   double pz = pose(2, 3);
 
+  // Solve base
+  double base = atan2(-ox,oy);
+
+  // Solve elbow
+  double elbow = asin(
+    (
+      (ax*ny-ay*nx)*(nx*oy-ny*ox-nx*py*2.0E+1+ny*px*2.0E+1)*3.5E+2
+    )
+    /
+    (
+      (ax*ax)*(ny*ny)*7.744E+3 +
+      (ay*ay)*(nx*nx)*7.744E+3 +
+      (ax*ax)*(oy*oy)*2.5E+1 +
+      (ay*ay)*(ox*ox)*2.5E+1 +
+      (ax*ax)*(py*py)*1.0E+4 +
+      (ay*ay)*(px*px)*1.0E+4 +
+      (nx*nx)*(oy*oy)*2.5E+1 +
+      (ny*ny)*(ox*ox)*2.5E+1 +
+      (nx*nx)*(py*py)*1.0E+4 +
+      (ny*ny)*(px*px)*1.0E+4 -
+      (ay*ay)*ox*px*1.0E+3 -
+      (ax*ax)*oy*py*1.0E+3 -
+      (ny*ny)*ox*px*1.0E+3 -
+      (nx*nx)*oy*py*1.0E+3 +
+      (ay*ay)*nx*ox*8.8E+2 +
+      (ax*ax)*ny*oy*8.8E+2 -
+      (ay*ay)*nx*px*1.76E+4 -
+      (ax*ax)*ny*py*1.76E+4 -
+      ax*ay*nx*oy*8.8E+2 -
+      ax*ay*ny*ox*8.8E+2 +
+      ax*ay*nx*py*1.76E+4 +
+      ax*ay*ny*px*1.76E+4 -
+      ax*ay*ox*oy*5.0E+1 +
+      ax*ay*ox*py*1.0E+3 +
+      ax*ay*oy*px*1.0E+3 -
+      ax*ay*px*py*2.0E+4 -
+      nx*ny*ox*oy*5.0E+1 +
+      nx*ny*ox*py*1.0E+3 +
+      nx*ny*oy*px*1.0E+3 -
+      nx*ny*px*py*2.0E+4 -
+      ax*ay*nx*ny*1.5488E+4
+    )
+  );
+
+  // Solve shoulder
+  double shoulder = atan2(
+    (
+      (
+        ax *
+        sqrt(
+          pow(ax*ny-ay*nx, 2.0) *
+          pow(nx*oy-ny*ox-nx*py*2.0E+1+ny*px*2.0E+1, 2.0) *
+          1.0 / pow(
+            (ax*ax)*(ny*ny)*7.744E+3 +
+            (ay*ay)*(nx*nx)*7.744E+3 +
+            (ax*ax)*(oy*oy)*2.5E+1 +
+            (ay*ay)*(ox*ox)*2.5E+1 +
+            (ax*ax)*(py*py)*1.0E+4 +
+            (ay*ay)*(px*px)*1.0E+4 +
+            (nx*nx)*(oy*oy)*2.5E+1 +
+            (ny*ny)*(ox*ox)*2.5E+1 +
+            (nx*nx)*(py*py)*1.0E+4 +
+            (ny*ny)*(px*px)*1.0E+4 -
+            (ay*ay)*ox*px*1.0E+3 -
+            (ax*ax)*oy*py*1.0E+3 -
+            (ny*ny)*ox*px*1.0E+3 -
+            (nx*nx)*oy*py*1.0E+3 +
+            (ay*ay)*nx*ox*8.8E+2 +
+            (ax*ax)*ny*oy*8.8E+2 -
+            (ay*ay)*nx*px*1.76E+4 -
+            (ax*ax)*ny*py*1.76E+4 -
+            ax*ay*nx*oy*8.8E+2 -
+            ax*ay*ny*ox*8.8E+2 +
+            ax*ay*nx*py*1.76E+4 +
+            ax*ay*ny*px*1.76E+4 -
+            ax*ay*ox*oy*5.0E+1 +
+            ax*ay*ox*py*1.0E+3 +
+            ax*ay*oy*px*1.0E+3 -
+            ax*ay*px*py*2.0E+4 -
+            nx*ny*ox*oy*5.0E+1 +
+            nx*ny*ox*py*1.0E+3 +
+            nx*ny*oy*px*1.0E+3 -
+            nx*ny*px*py*2.0E+4 -
+            ax*ay*nx*ny*1.5488E+4,
+            2.0
+          )
+          *
+          -1.225E+5+1.0
+        )
+        -
+        (nx*(ax*ny-ay*nx)*(nx*oy-ny*ox-nx*py*2.0E+1+ny*px*2.0E+1)*3.5E+2)
+        /
+        (
+          (ax*ax)*(ny*ny)*7.744E+3 +
+          (ay*ay)*(nx*nx)*7.744E+3 +
+          (ax*ax)*(oy*oy)*2.5E+1 +
+          (ay*ay)*(ox*ox)*2.5E+1 +
+          (ax*ax)*(py*py)*1.0E+4 +
+          (ay*ay)*(px*px)*1.0E+4 +
+          (nx*nx)*(oy*oy)*2.5E+1 +
+          (ny*ny)*(ox*ox)*2.5E+1 +
+          (nx*nx)*(py*py)*1.0E+4 +
+          (ny*ny)*(px*px)*1.0E+4 -
+          (ay*ay)*ox*px*1.0E+3 -
+          (ax*ax)*oy*py*1.0E+3 -
+          (ny*ny)*ox*px*1.0E+3 -
+          (nx*nx)*oy*py*1.0E+3 +
+          (ay*ay)*nx*ox*8.8E+2 +
+          (ax*ax)*ny*oy*8.8E+2 -
+          (ay*ay)*nx*px*1.76E+4 -
+          (ax*ax)*ny*py*1.76E+4 -
+          ax*ay*nx*oy*8.8E+2 -
+          ax*ay*ny*ox*8.8E+2 +
+          ax*ay*nx*py*1.76E+4 +
+          ax*ay*ny*px*1.76E+4 -
+          ax*ay*ox*oy*5.0E+1 +
+          ax*ay*ox*py*1.0E+3 +
+          ax*ay*oy*px*1.0E+3 -
+          ax*ay*px*py*2.0E+4 -
+          nx*ny*ox*oy*5.0E+1 +
+          nx*ny*ox*py*1.0E+3 +
+          nx*ny*oy*px*1.0E+3 -
+          nx*ny*px*py*2.0E+4 -
+          ax*ay*nx*ny*1.5488E+4
+        )
+      )
+      *
+      sqrt(ox*ox+oy*oy)
+    )
+    /
+    oy,
+    (
+      (
+        nx *
+        sqrt(
+          pow(ax*ny-ay*nx, 2.0) *
+          pow(nx*oy-ny*ox-nx*py*2.0E+1+ny*px*2.0E+1, 2.0) *
+          1.0 / pow(
+            (ax*ax)*(ny*ny)*7.744E+3 +
+            (ay*ay)*(nx*nx)*7.744E+3 +
+            (ax*ax)*(oy*oy)*2.5E+1 +
+            (ay*ay)*(ox*ox)*2.5E+1 +
+            (ax*ax)*(py*py)*1.0E+4 +
+            (ay*ay)*(px*px)*1.0E+4 +
+            (nx*nx)*(oy*oy)*2.5E+1 +
+            (ny*ny)*(ox*ox)*2.5E+1 +
+            (nx*nx)*(py*py)*1.0E+4 +
+            (ny*ny)*(px*px)*1.0E+4 -
+            (ay*ay)*ox*px*1.0E+3 -
+            (ax*ax)*oy*py*1.0E+3 -
+            (ny*ny)*ox*px*1.0E+3 -
+            (nx*nx)*oy*py*1.0E+3 +
+            (ay*ay)*nx*ox*8.8E+2 +
+            (ax*ax)*ny*oy*8.8E+2 -
+            (ay*ay)*nx*px*1.76E+4 -
+            (ax*ax)*ny*py*1.76E+4 -
+            ax*ay*nx*oy*8.8E+2 -
+            ax*ay*ny*ox*8.8E+2 +
+            ax*ay*nx*py*1.76E+4 +
+            ax*ay*ny*px*1.76E+4 -
+            ax*ay*ox*oy*5.0E+1 +
+            ax*ay*ox*py*1.0E+3 +
+            ax*ay*oy*px*1.0E+3 -
+            ax*ay*px*py*2.0E+4 -
+            nx*ny*ox*oy*5.0E+1 +
+            nx*ny*ox*py*1.0E+3 +
+            nx*ny*oy*px*1.0E+3 -
+            nx*ny*px*py*2.0E+4 -
+            ax*ay*nx*ny*1.5488E+4,
+            2.0
+          )
+          *
+          -1.225E+5+1.0
+        ) +
+        (ax*(ax*ny-ay*nx)*(nx*oy-ny*ox-nx*py*2.0E+1+ny*px*2.0E+1)*3.5E+2)
+        /
+        (
+          (ax*ax)*(ny*ny)*7.744E+3 +
+          (ay*ay)*(nx*nx)*7.744E+3 +
+          (ax*ax)*(oy*oy)*2.5E+1 +
+          (ay*ay)*(ox*ox)*2.5E+1 +
+          (ax*ax)*(py*py)*1.0E+4 +
+          (ay*ay)*(px*px)*1.0E+4 +
+          (nx*nx)*(oy*oy)*2.5E+1 +
+          (ny*ny)*(ox*ox)*2.5E+1 +
+          (nx*nx)*(py*py)*1.0E+4 +
+          (ny*ny)*(px*px)*1.0E+4 -
+          (ay*ay)*ox*px*1.0E+3 -
+          (ax*ax)*oy*py*1.0E+3 -
+          (ny*ny)*ox*px*1.0E+3 -
+          (nx*nx)*oy*py*1.0E+3 +
+          (ay*ay)*nx*ox*8.8E+2 +
+          (ax*ax)*ny*oy*8.8E+2 -
+          (ay*ay)*nx*px*1.76E+4 -
+          (ax*ax)*ny*py*1.76E+4 -
+          ax*ay*nx*oy*8.8E+2 -
+          ax*ay*ny*ox*8.8E+2 +
+          ax*ay*nx*py*1.76E+4 +
+          ax*ay*ny*px*1.76E+4 -
+          ax*ay*ox*oy*5.0E+1 +
+          ax*ay*ox*py*1.0E+3 +
+          ax*ay*oy*px*1.0E+3 -
+          ax*ay*px*py*2.0E+4 -
+          nx*ny*ox*oy*5.0E+1 +
+          nx*ny*ox*py*1.0E+3 +
+          nx*ny*oy*px*1.0E+3 -
+          nx*ny*px*py*2.0E+4 -
+          ax*ay*nx*ny*1.5488E+4
+        )
+      )
+      *
+      sqrt(ox*ox+oy*oy)
+    )/oy
+  );
+
+  double wrist = atan((az-sqrt(az*az+oz*oz))/oz)*-2.0;
+
   MatrixXd angles(4, 1);
-  angles << 0.0, 0.0, 0.0, 0.0;
+  angles << base, shoulder, elbow, wrist;
   return angles;
 }
 
