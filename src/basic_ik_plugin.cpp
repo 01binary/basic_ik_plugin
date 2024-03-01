@@ -23,6 +23,26 @@ IKPlugin::IKPlugin() :
 
 MatrixXd IKPlugin::solve(Matrix4d pose) const
 {
+  // Normal
+  double nx = pose(0, 0);
+  double ny = pose(1, 0);
+  double nz = pose(2, 0);
+
+  // Orientation
+  double ox = pose(0, 1);
+  double oy = pose(1, 1);
+  double oz = pose(2, 1);
+
+  // Approach
+  double ax = pose(0, 2);
+  double ay = pose(1, 2);
+  double az = pose(2, 2);
+
+  // Position
+  double px = pose(0, 3);
+  double py = pose(1, 3);
+  double pz = pose(2, 3);
+
   MatrixXd angles(4, 1);
   angles << 0.0, 0.0, 0.0, 0.0;
   return angles;
