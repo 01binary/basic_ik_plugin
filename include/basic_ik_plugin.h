@@ -153,7 +153,7 @@ private:
       double value,
       std::vector<double>& states) const;
 
-    inline double pow2(double x)
+    static inline double pow2(double x)
     {
       return x * x;
     }
