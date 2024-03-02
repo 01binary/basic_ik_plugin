@@ -29,7 +29,7 @@ bool IKPlugin::getPositionFK(
   const vector<double> &joint_angles,
   vector<geometry_msgs::Pose> &poses) const
 {
-  /*Isometry3d pose =
+  auto pose =
     Translation3d(0, 0, 0) *
     AngleAxisd(joint_angles[JOINTS::BASE], Vector3d::UnitZ()) *
     Translation3d(0, 0, 0.670) *
@@ -41,7 +41,7 @@ bool IKPlugin::getPositionFK(
     Translation3d(0.18, 0, 0) *
     AngleAxisd(0.0, Vector3d::UnitX());
 
-  geometry_msgs::Pose poseMsg;
+  /*geometry_msgs::Pose poseMsg;
     tf::poseEigenToMsg(pose, poseMsg);
     poses.push_back(poseMsg);*/
 
