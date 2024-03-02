@@ -18,6 +18,9 @@ namespace basic {
 class IKPlugin : public kinematics::KinematicsBase
 {
 private:
+  ros::NodeHandle m_node;
+  ros::Publisher m_markerPub;
+
   enum JOINTS
   {
     BASE,
@@ -170,6 +173,11 @@ private:
 
         return value;
     }
+
+    void publishArrowMarker(
+        int id,
+        std::vector<Eigen::Vector3d> points,
+        Eigen::Vector3d color) const;
 };
 
 } // namespace basic

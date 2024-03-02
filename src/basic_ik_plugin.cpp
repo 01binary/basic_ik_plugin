@@ -1,4 +1,5 @@
 #include <cmath>
+#include <Eigen/Geometry>
 #include <pluginlib/class_list_macros.h>
 #include <eigen_conversions/eigen_msg.h>
 #include <tf2_eigen/tf2_eigen.h>
@@ -167,7 +168,23 @@ bool IKPlugin::getPositionFK(
   const vector<double> &joint_angles,
   vector<geometry_msgs::Pose> &poses) const
 {
-  return false;
+  Isometry3d pose =
+    Translation3d(0, 0, 0) *
+    AngleAxisd(joint_angles[JOINTS::BASE], Vector3d::UnitZ()) *
+    Translation3d(0, 0, 0.670) *
+    AngleAxisd(joint_angles[JOINTS::SHOULDER], Vector3d::UnitY()) *
+    Translation3d(0.7, 0, 0) *
+    AngleAxisd(joint_angles[JOINTS::ELBOW], Vector3d::UnitY()) *
+    Translation3d(0.7, 0.05, 0) *
+    AngleAxisd(joint_angles(JOINTS::WRIST), Vector3d::UnitX()) *
+    Translation3d(0.18, 0, 0) *
+    AngleAxisd(0.0, Vector3d::UnitX());
+
+  geometry_msgs::Pose poseMsg;
+    tf::poseEigenToMsg(pose, poseMsg);
+    poses.push_back(poseMsg);
+
+    return true;
 }
 
 bool IKPlugin::getPositionIK(
@@ -374,6 +391,31 @@ const Vector3d& IKPlugin::getJointAxis(const JointModel* pJoint)
   {
     return dynamic_cast<const PrismaticJointModel*>(pJoint)->getAxis();
   }
+}
+
+void IKPlugin::publishArrowMarker(int id, vector<Vector3d> points, Vector3d color) const
+{
+    Marker marker;
+    marker.id = id;
+    marker.type = Marker::ARROW;
+    marker.header.frame_id = "world";
+    marker.scale.x = 0.01;
+    marker.scale.y = 0.05;
+    marker.color.r = color.x();
+    marker.color.g = color.y();
+    marker.color.b = color.z();
+    marker.color.a = 1.0;
+
+    for (const Vector3d& point : points)
+    {
+        geometry_msgs::Point msgPoint;
+        msgPoint.x = point.x();
+        msgPoint.y = point.y();
+        msgPoint.z = point.z();
+        marker.points.push_back(msgPoint);
+    }
+
+    m_markerPub.publish(marker);
 }
 
 PLUGINLIB_EXPORT_CLASS(basic::IKPlugin, kinematics::KinematicsBase);
