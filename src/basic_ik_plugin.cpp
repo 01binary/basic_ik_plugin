@@ -13,6 +13,8 @@ using namespace moveit_msgs;
 using namespace Eigen;
 using namespace basic;
 
+using namespace visualization_msgs;
+
 IKPlugin::IKPlugin() :
     m_pPlanningGroup(NULL),
     m_pBaseJoint(NULL),
@@ -20,6 +22,30 @@ IKPlugin::IKPlugin() :
     m_pElbowJoint(NULL),
     m_pWristJoint(NULL)
 {
+}
+
+bool IKPlugin::getPositionFK(
+  const vector<string> &link_names,
+  const vector<double> &joint_angles,
+  vector<geometry_msgs::Pose> &poses) const
+{
+  /*Isometry3d pose =
+    Translation3d(0, 0, 0) *
+    AngleAxisd(joint_angles[JOINTS::BASE], Vector3d::UnitZ()) *
+    Translation3d(0, 0, 0.670) *
+    AngleAxisd(joint_angles[JOINTS::SHOULDER], Vector3d::UnitY()) *
+    Translation3d(0.7, 0, 0) *
+    AngleAxisd(joint_angles[JOINTS::ELBOW], Vector3d::UnitY()) *
+    Translation3d(0.7, 0.05, 0) *
+    AngleAxisd(joint_angles(JOINTS::WRIST), Vector3d::UnitX()) *
+    Translation3d(0.18, 0, 0) *
+    AngleAxisd(0.0, Vector3d::UnitX());
+
+  geometry_msgs::Pose poseMsg;
+    tf::poseEigenToMsg(pose, poseMsg);
+    poses.push_back(poseMsg);*/
+
+    return true;
 }
 
 MatrixXd IKPlugin::solve(Matrix4d pose) const
@@ -165,30 +191,6 @@ const vector<string> &IKPlugin::getJointNames() const
 const vector<string> &IKPlugin::getLinkNames() const
 {
   return m_pPlanningGroup->getLinkModelNames();
-}
-
-bool IKPlugin::getPositionFK(
-  const vector<string> &link_names,
-  const vector<double> &joint_angles,
-  vector<geometry_msgs::Pose> &poses) const
-{
-  Isometry3d pose =
-    Translation3d(0, 0, 0) *
-    AngleAxisd(joint_angles[JOINTS::BASE], Vector3d::UnitZ()) *
-    Translation3d(0, 0, 0.670) *
-    AngleAxisd(joint_angles[JOINTS::SHOULDER], Vector3d::UnitY()) *
-    Translation3d(0.7, 0, 0) *
-    AngleAxisd(joint_angles[JOINTS::ELBOW], Vector3d::UnitY()) *
-    Translation3d(0.7, 0.05, 0) *
-    AngleAxisd(joint_angles(JOINTS::WRIST), Vector3d::UnitX()) *
-    Translation3d(0.18, 0, 0) *
-    AngleAxisd(0.0, Vector3d::UnitX());
-
-  geometry_msgs::Pose poseMsg;
-    tf::poseEigenToMsg(pose, poseMsg);
-    poses.push_back(poseMsg);
-
-    return true;
 }
 
 bool IKPlugin::getPositionIK(
