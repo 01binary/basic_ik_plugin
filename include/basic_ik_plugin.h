@@ -175,9 +175,9 @@ private:
     }
 
     void publishArrowMarker(
-        int id,
-        std::vector<Eigen::Vector3d> points,
-        Eigen::Vector3d color) const;
+      int id,
+      std::vector<Eigen::Vector3d> points,
+      Eigen::Vector3d color) const;
 };
 
 } // namespace basic

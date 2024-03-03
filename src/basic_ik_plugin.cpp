@@ -37,13 +37,13 @@ bool IKPlugin::getPositionFK(
     Translation3d(0.7, 0, 0) *
     AngleAxisd(joint_angles[JOINTS::ELBOW], Vector3d::UnitY()) *
     Translation3d(0.7, 0.05, 0) *
-    AngleAxisd(joint_angles(JOINTS::WRIST), Vector3d::UnitX()) *
+    AngleAxisd(joint_angles[JOINTS::WRIST], Vector3d::UnitX()) *
     Translation3d(0.18, 0, 0) *
     AngleAxisd(0.0, Vector3d::UnitX());
 
-  /*geometry_msgs::Pose poseMsg;
+  geometry_msgs::Pose poseMsg;
     tf::poseEigenToMsg(pose, poseMsg);
-    poses.push_back(poseMsg);*/
+    poses.push_back(poseMsg);
 
     return true;
 }
@@ -401,27 +401,27 @@ const Vector3d& IKPlugin::getJointAxis(const JointModel* pJoint)
 
 void IKPlugin::publishArrowMarker(int id, vector<Vector3d> points, Vector3d color) const
 {
-    Marker marker;
-    marker.id = id;
-    marker.type = Marker::ARROW;
-    marker.header.frame_id = "world";
-    marker.scale.x = 0.01;
-    marker.scale.y = 0.05;
-    marker.color.r = color.x();
-    marker.color.g = color.y();
-    marker.color.b = color.z();
-    marker.color.a = 1.0;
+  Marker marker;
+  marker.id = id;
+  marker.type = Marker::ARROW;
+  marker.header.frame_id = "world";
+  marker.scale.x = 0.01;
+  marker.scale.y = 0.05;
+  marker.color.r = color.x();
+  marker.color.g = color.y();
+  marker.color.b = color.z();
+  marker.color.a = 1.0;
 
-    for (const Vector3d& point : points)
-    {
-        geometry_msgs::Point msgPoint;
-        msgPoint.x = point.x();
-        msgPoint.y = point.y();
-        msgPoint.z = point.z();
-        marker.points.push_back(msgPoint);
-    }
+  for (const Vector3d& point : points)
+  {
+    geometry_msgs::Point msgPoint;
+    msgPoint.x = point.x();
+    msgPoint.y = point.y();
+    msgPoint.z = point.z();
+    marker.points.push_back(msgPoint);
+  }
 
-    m_markerPub.publish(marker);
+  m_markerPub.publish(marker);
 }
 
 PLUGINLIB_EXPORT_CLASS(basic::IKPlugin, kinematics::KinematicsBase);
