@@ -127,8 +127,10 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   // Visualize solution
 
   Vector3d basePos =
-    Translation3d(0, 0, 0) *
-    AngleAxisd(base, Vector3d::UnitZ())
+    (
+      Translation3d(0, 0, 0) *
+      AngleAxisd(base, Vector3d::UnitZ())
+    )
     .matrix()
     .translation();
 
