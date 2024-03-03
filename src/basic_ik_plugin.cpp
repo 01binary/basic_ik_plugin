@@ -134,7 +134,7 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
     .matrix()
     .block(0, 3, 3, 1);
 
-  Vector3d shoulderPose =
+  /*Vector3d shoulderPose =
     (
       Translation3d(0, 0, 0) *
       AngleAxisd(base, Vector3d::UnitZ()) *
@@ -175,7 +175,7 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   publishArrowMarker(
     JOINTS::SHOULDER, { shoulderPose, elbowPose }, Vector3d(1.0, 0.0, 1.0));
   publishArrowMarker(
-    JOINTS::ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));
+    JOINTS::ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));*/
 
   return angles;
 }
