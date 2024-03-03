@@ -134,7 +134,7 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
     .matrix()
     .block(0, 3, 3, 1);
 
-  /*Vector3d shoulderPose =
+  Vector3d shoulderPose =
     (
       Translation3d(0, 0, 0) *
       AngleAxisd(base, Vector3d::UnitZ()) *
@@ -144,7 +144,7 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
     .matrix()
     .block(0, 3, 3, 1);
 
-  Vector3d elbowPose
+  /*Vector3d elbowPose
     (
       Translation3d(0, 0, 0) *
       AngleAxisd(base, Vector3d::UnitZ()) *
