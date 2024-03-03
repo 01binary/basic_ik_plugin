@@ -126,11 +126,12 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
 
   // Visualize solution
 
-  auto basePose =
+  auto basePoseMatrix =
     Translation3d(0, 0, 0) *
     AngleAxisd(base, Vector3d::UnitZ())
-    .matrix()
-    .block(0, 3, 3, 1);
+    .matrix();
+
+  auto basePose = basePoseMatrix.block(0, 3, 3, 1);
 
   Vector3d bp = basePose;
   /*Vector3d shoulderPose =
