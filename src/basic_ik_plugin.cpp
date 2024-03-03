@@ -132,7 +132,7 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
       AngleAxisd(base, Vector3d::UnitZ())
     )
     .matrix()
-    .translation();
+    .block(0, 3, 3, 1);
 
   /*Vector3d shoulderPose =
     Translation3d(0, 0, 0.670) *
