@@ -124,22 +124,35 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
   MatrixXd angles(4, 1);
   angles << base, shoulder, 0.0, wrist;
 
-  vector<string> names;
+  // Visualize solution
 
-  Vector3d shoulderPose = getPositionFK(names, angles.block(0, 0, 2, 1))
+  Vector3d basePose =
+    Translation3d(0, 0, 0) *
+    AngleAxisd(base, Vector3d::UnitZ())
     .matrix()
     .block(0, 3, 3, 1);
-  Vector3d elbowPose = getPositionFK(angles.block(0, 0, 3, 1))
+  Vector3d shoulderPose =
+    Translation3d(0, 0, 0.670) *
+    AngleAxisd(shoulder, Vector3d::UnitY()) *
     .matrix()
     .block(0, 3, 3, 1);
-  Vector3d wristPose = getPositionFK(angles.block(0, 0, 4, 1))
-    .matrix()`
+  Vector3d elbowPose
+    Translation3d(0.7, 0, 0) *
+    AngleAxisd(elbow, Vector3d::UnitY()) *
+    .matrix()
+    .block(0, 3, 3, 1);
+  Vector3d wristPose =
+    Translation3d(0.7, 0.05, 0) *
+    AngleAxisd(wrist, Vector3d::UnitX()) *
+    Translation3d(0.18, 0, 0) *
+    AngleAxisd(0.0, Vector3d::UnitX())
+    .matrix()
     .block(0, 3, 3, 1);
 
-    publishArrowMarker(
-      SHOULDER, { shoulderPose, elbowPose }, Vector3d(1.0, 0.0, 1.0));
-    publishArrowMarker(
-      ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));
+  publishArrowMarker(
+    SHOULDER, { shoulderPose, elbowPose }, Vector3d(1.0, 0.0, 1.0));
+  publishArrowMarker(
+    ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));
 
   return angles;
 }
