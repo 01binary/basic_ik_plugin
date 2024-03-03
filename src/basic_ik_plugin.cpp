@@ -123,6 +123,25 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
 
   MatrixXd angles(4, 1);
   angles << base, shoulder, 0.0, wrist;
+
+  vector<string> names;
+
+
+  Vector3d shoulderPose = origin + getPositionFK(names, angles.block(0, 0, 2, 1))
+    .matrix()
+    .block(0, 3, 3, 1);
+  Vector3d elbowPose = origin + getPositionFK(angles.block(0, 0, 3, 1))
+    .matrix()
+    .block(0, 3, 3, 1);
+  Vector3d wristPose = origin + getPositionFK(angles.block(0, 0, 4, 1))
+    .matrix()
+    .block(0, 3, 3, 1);
+
+    publishArrowMarker(
+        SHOULDER, { shoulderPose, elbowPose }, Vector3d(1.0, 0.0, 1.0));
+    publishArrowMarker(
+        ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));
+
   return angles;
 }
 
