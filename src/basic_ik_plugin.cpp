@@ -134,28 +134,48 @@ MatrixXd IKPlugin::solve(Matrix4d pose) const
     .matrix()
     .block(0, 3, 3, 1);
 
-  /*Vector3d shoulderPose =
-    Translation3d(0, 0, 0.670) *
-    AngleAxisd(shoulder, Vector3d::UnitY()) *
+  Vector3d shoulderPose =
+    (
+      Translation3d(0, 0, 0) *
+      AngleAxisd(base, Vector3d::UnitZ()) *
+      Translation3d(0, 0, 0.670) *
+      AngleAxisd(shoulder, Vector3d::UnitY())
+    )
     .matrix()
     .block(0, 3, 3, 1);
+
   Vector3d elbowPose
-    Translation3d(0.7, 0, 0) *
-    AngleAxisd(elbow, Vector3d::UnitY()) *
+    (
+      Translation3d(0, 0, 0) *
+      AngleAxisd(base, Vector3d::UnitZ()) *
+      Translation3d(0, 0, 0.670) *
+      AngleAxisd(shoulder, Vector3d::UnitY()) *
+      Translation3d(0.7, 0, 0) *
+      AngleAxisd(elbow, Vector3d::UnitY())
+    )
     .matrix()
     .block(0, 3, 3, 1);
+
   Vector3d wristPose =
-    Translation3d(0.7, 0.05, 0) *
-    AngleAxisd(wrist, Vector3d::UnitX()) *
-    Translation3d(0.18, 0, 0) *
-    AngleAxisd(0.0, Vector3d::UnitX())
+    (
+      Translation3d(0, 0, 0) *
+      AngleAxisd(base, Vector3d::UnitZ()) *
+      Translation3d(0, 0, 0.670) *
+      AngleAxisd(shoulder, Vector3d::UnitY()) *
+      Translation3d(0.7, 0, 0) *
+      AngleAxisd(elbow, Vector3d::UnitY()) *
+      Translation3d(0.7, 0.05, 0) *
+      AngleAxisd(wrist, Vector3d::UnitX()) *
+      Translation3d(0.18, 0, 0) *
+      AngleAxisd(0.0, Vector3d::UnitX())
+    )
     .matrix()
     .block(0, 3, 3, 1);
 
   publishArrowMarker(
-    SHOULDER, { shoulderPose, elbowPose }, Vector3d(1.0, 0.0, 1.0));
+    JOINTS::SHOULDER, { shoulderPose, elbowPose }, Vector3d(1.0, 0.0, 1.0));
   publishArrowMarker(
-    ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));*/
+    JOINTS::ELBOW, { elbowPose, wristPose }, Vector3d(0.0, 1.0, 1.0));
 
   return angles;
 }
